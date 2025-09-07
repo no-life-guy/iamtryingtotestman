@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Developer Launchpad</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        darkMode: "class", // Enable dark mode using a class
+        theme: {
+          extend: {
+            fontFamily: {
+              mono: ["Roboto Mono", "monospace"],
+            },
+            colors: {
+              // Light Mode Colors
+              "light-bg": "#F3F4F6", // gray-100
+              "light-surface": "#FFFFFF",
+              "light-text": "#111827", // gray-900
+              "light-muted": "#4B5563", // gray-600
+              "light-primary": "#3B82F6", // blue-500
+              "light-secondary": "#8B5CF6", // violet-500
+
+              // Dark Mode Colors
+              "dark-bg": "#030712", // gray-950
+              "dark-surface": "#111827", // gray-900
+              "dark-text": "#F9FAFB", // gray-50
+              "dark-muted": "#9CA3AF", // gray-400
+              "dark-primary": "#60A5FA", // blue-400
+              "dark-secondary": "#A78BFA", // violet-400
+            },
+            boxShadow: {
+              "glow-primary": "0 0 15px rgba(59, 130, 246, 0.5)",
+              "glow-secondary": "0 0 15px rgba(139, 92, 246, 0.5)",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      /* Custom styles for a futuristic feel */
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .light .glass-effect {
+        background: rgba(255, 255, 255, 0.6);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+      }
+
+      /* Scrollbar styling */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #111827;
+      }
+      .light ::-webkit-scrollbar-track {
+        background: #f3f4f6;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #3b82f6;
+        border-radius: 4px;
+      }
+      .light ::-webkit-scrollbar-thumb {
+        background: #60a5fa;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #8b5cf6;
+      }
+      .light ::-webkit-scrollbar-thumb:hover {
+        background: #a78bfa;
+      }
+
+      /* Task list transitions */
+      .task-item {
+        transition: all 0.3s ease;
+      }
+      .task-item.removing {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      .task-item.completed span {
+        text-decoration: line-through;
+        color: #9ca3af;
+      }
+    </style>
+  </head>
+  <body
+    class="font-mono bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text transition-colors duration-500"
+  >
+    <!-- App Wrapper -->
+    <div class="min-h-screen p-4 sm:p-6 lg:p-8">
+      <!-- Header -->
+      <header class="flex justify-between items-center mb-8">
+        <h1
+          class="text-xl sm:text-2xl font-bold text-light-primary dark:text-dark-primary"
+        >
+          DevLaunch
+        </h1>
+        <button
+          id="theme-toggle"
+          class="p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-light-primary dark:focus:ring-dark-primary"
+        >
+          <!-- Sun Icon -->
+          <svg
+            id="theme-icon-light"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="hidden"
+          >
+            <circle cx="12" cy="12" r="5" />
+            <line x1="12" x2="12" y1="1" y2="3" />
+            <line x1="12" x2="12" y1="21" y2="23" />
+            <line x1="4.22" x2="5.64" y1="4.22" y2="5.64" />
+            <line x1="18.36" x2="19.78" y1="18.36" y2="19.78" />
+            <line x1="1" x2="3" y1="12" y2="12" />
+            <line x1="21" x2="23" y1="12" y2="12" />
+            <line x1="4.22" x2="5.64" y1="19.78" y2="18.36" />
+            <line x1="18.36" x2="19.78" y1="5.64" y2="4.22" />
+          </svg>
+          <!-- Moon Icon -->
+          <svg
+            id="theme-icon-dark"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="hidden"
+          >
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+        </button>
+      </header>
+
+      <!-- Main Grid Layout -->
+      <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Clock & Date Widget (spans 2 columns on large screens) -->
+        <div
+          class="md:col-span-2 lg:col-span-2 p-6 rounded-2xl glass-effect transition-all duration-300 hover:shadow-glow-primary"
+        >
+          <h2
+            class="font-bold text-lg mb-4 text-light-muted dark:text-dark-muted"
+          >
+            System Time
+          </h2>
+          <div class="text-center">
+            <div
+              id="clock"
+              class="text-5xl lg:text-7xl font-bold text-light-text dark:text-dark-text tracking-widest"
+            >
+              00:00:00
+            </div>
+            <div
+              id="date"
+              class="text-lg text-light-muted dark:text-dark-muted mt-2"
+            >
+              January 1, 1970
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Links Widget -->
+        <div
+          class="p-6 rounded-2xl glass-effect transition-all duration-300 hover:shadow-glow-secondary"
+        >
+          <h2
+            class="font-bold text-lg mb-4 text-light-muted dark:text-dark-muted"
+          >
+            Quick Links
+          </h2>
+          <div class="space-y-3">
+            <a
+              href="https://github.com"
+              target="_blank"
+              class="flex items-center space-x-3 p-2 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"
+                />
+                <path d="M9 18c-4.51 2-5-2-7-2" />
+              </svg>
+              <span>GitHub</span>
+            </a>
+            <a
+              href="https://stackoverflow.com"
+              target="_blank"
+              class="flex items-center space-x-3 p-2 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M7 17v-4h10v4" />
+                <path d="M17 13H7" />
+                <path d="m12 7 3 3-3 3" />
+                <path
+                  d="M3 15V9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+                />
+              </svg>
+              <span>Stack Overflow</span>
+            </a>
+            <a
+              href="https://developer.mozilla.org"
+              target="_blank"
+              class="flex items-center space-x-3 p-2 rounded-lg hover:bg-light-bg dark:hover:bg-dark-bg transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"
+                />
+              </svg>
+              <span>MDN Docs</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Code Snippets Widget -->
+        <div
+          class="p-6 rounded-2xl glass-effect transition-all duration-300 hover:shadow-glow-secondary"
+        >
+          <h2
+            class="font-bold text-lg mb-4 text-light-muted dark:text-dark-muted"
+          >
+            Snippets
+          </h2>
+          <div class="space-x-2 mb-4">
+            <button
+              class="snippet-btn bg-light-primary text-white dark:bg-dark-primary dark:text-dark-bg py-1 px-3 rounded-full text-sm"
+              data-snippet="fetch"
+            >
+              Fetch API
+            </button>
+            <button
+              class="snippet-btn py-1 px-3 rounded-full text-sm"
+              data-snippet="async"
+            >
+              Async/Await
+            </button>
+          </div>
+          <div
+            class="relative bg-light-bg dark:bg-dark-bg rounded-lg p-4 h-40 overflow-auto"
+          >
+            <pre><code id="snippet-display" class="text-sm"></code></pre>
+            <button
+              id="copy-snippet-btn"
+              class="absolute top-2 right-2 p-1.5 rounded-md bg-light-surface dark:bg-dark-surface hover:bg-gray-200 dark:hover:bg-gray-700"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                <path
+                  d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+                />
+              </svg>
+            </button>
+            <span
+              id="copy-confirm"
+              class="absolute top-2 right-10 text-xs text-green-500 opacity-0 transition-opacity"
+              >Copied!</span
+            >
+          </div>
+        </div>
+
+        <!-- Task Tracker Widget (spans 2 columns) -->
+        <div
+          class="md:col-span-2 p-6 rounded-2xl glass-effect transition-all duration-300 hover:shadow-glow-primary"
+        >
+          <h2
+            class="font-bold text-lg mb-4 text-light-muted dark:text-dark-muted"
+          >
+            Task Tracker
+          </h2>
+          <form id="task-form" class="flex gap-2 mb-4">
+            <input
+              type="text"
+              id="task-input"
+              placeholder="Add a new task..."
+              class="w-full bg-light-bg dark:bg-dark-bg border-none rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-light-secondary dark:focus:ring-dark-secondary"
+            />
+            <button
+              type="submit"
+              class="bg-light-secondary text-white dark:bg-dark-secondary dark:text-dark-bg font-bold py-2 px-4 rounded-lg hover:opacity-90 transition-opacity"
+            >
+              Add
+            </button>
+          </form>
+          <ul id="task-list" class="space-y-2 h-48 overflow-y-auto pr-2">
+            <!-- Tasks will be injected here by JavaScript -->
+          </ul>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // --- THEME TOGGLER ---
+        const themeToggle = document.getElementById("theme-toggle");
+        const lightIcon = document.getElementById("theme-icon-light");
+        const darkIcon = document.getElementById("theme-icon-dark");
+        const docElement = document.documentElement;
+
+        // Function to set theme
+        const setTheme = (theme) => {
+          if (theme === "dark") {
+            docElement.classList.add("dark");
+            lightIcon.classList.add("hidden");
+            darkIcon.classList.remove("hidden");
+          } else {
+            docElement.classList.remove("dark");
+            darkIcon.classList.add("hidden");
+            lightIcon.classList.remove("hidden");
+          }
+          localStorage.setItem("theme", theme);
+        };
+
+        // Check for saved theme in localStorage or user preference
+        const savedTheme = localStorage.getItem("theme");
+        const prefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)"
+        ).matches;
+        const initialTheme = savedTheme
+          ? savedTheme
+          : prefersDark
+          ? "dark"
+          : "light";
+        setTheme(initialTheme);
+
+        // Toggle theme on button click
+        themeToggle.addEventListener("click", () => {
+          const currentTheme = docElement.classList.contains("dark")
+            ? "dark"
+            : "light";
+          const newTheme = currentTheme === "dark" ? "light" : "dark";
+          setTheme(newTheme);
+        });
+
+        // --- CLOCK & DATE WIDGET ---
+        const clockEl = document.getElementById("clock");
+        const dateEl = document.getElementById("date");
+
+        function updateTime() {
+          const now = new Date();
+          const timeString = now.toLocaleTimeString("en-US", { hour12: false });
+          const dateString = now.toLocaleDateString("en-US", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          });
+          clockEl.textContent = timeString;
+          dateEl.textContent = dateString;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // --- CODE SNIPPET MANAGER ---
+        const snippets = {
+          fetch: `fetch('https://api.example.com/data')
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Error:', error));`,
+          async: `async function fetchData() {
+  try {
+    const response = await fetch('https://api.example.com/data');
+    const data = await response.json();
+    console.log(data);
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}`,
+        };
+
+        const snippetDisplay = document.getElementById("snippet-display");
+        const snippetBtns = document.querySelectorAll(".snippet-btn");
+        const copyBtn = document.getElementById("copy-snippet-btn");
+        const copyConfirm = document.getElementById("copy-confirm");
+
+        let activeSnippet = "fetch";
+        snippetDisplay.textContent = snippets[activeSnippet];
+
+        snippetBtns.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            snippetBtns.forEach((b) => {
+              b.classList.remove(
+                "bg-light-primary",
+                "text-white",
+                "dark:bg-dark-primary",
+                "dark:text-dark-bg"
+              );
+            });
+            btn.classList.add(
+              "bg-light-primary",
+              "text-white",
+              "dark:bg-dark-primary",
+              "dark:text-dark-bg"
+            );
+            activeSnippet = btn.dataset.snippet;
+            snippetDisplay.textContent = snippets[activeSnippet];
+          });
+        });
+
+        copyBtn.addEventListener("click", () => {
+          const textToCopy = snippetDisplay.textContent;
+          // Using a temporary textarea element for robust copying
+          const tempTextArea = document.createElement("textarea");
+          tempTextArea.value = textToCopy;
+          document.body.appendChild(tempTextArea);
+          tempTextArea.select();
+          document.execCommand("copy");
+          document.body.removeChild(tempTextArea);
+
+          copyConfirm.classList.remove("opacity-0");
+          setTimeout(() => {
+            copyConfirm.classList.add("opacity-0");
+          }, 2000);
+        });
+
+        // --- TASK TRACKER ---
+        const taskForm = document.getElementById("task-form");
+        const taskInput = document.getElementById("task-input");
+        const taskList = document.getElementById("task-list");
+
+        taskForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const taskText = taskInput.value.trim();
+          if (taskText !== "") {
+            addTask(taskText);
+            taskInput.value = "";
+            taskInput.focus();
+          }
+        });
+
+        function addTask(text) {
+          const li = document.createElement("li");
+          li.className =
+            "task-item flex justify-between items-center p-2 bg-light-bg dark:bg-dark-bg rounded-lg";
+
+          const taskContent = document.createElement("span");
+          taskContent.textContent = text;
+
+          const completeBtn = document.createElement("button");
+          completeBtn.innerHTML = `&check;`;
+          completeBtn.className = "text-green-500 font-bold p-1";
+          completeBtn.onclick = () => {
+            li.classList.toggle("completed");
+          };
+
+          const deleteBtn = document.createElement("button");
+          deleteBtn.innerHTML = `&times;`;
+          deleteBtn.className = "text-red-500 font-bold p-1";
+          deleteBtn.onclick = () => {
+            li.classList.add("removing");
+            li.addEventListener("transitionend", () => li.remove());
+          };
+
+          const buttonWrapper = document.createElement("div");
+          buttonWrapper.className = "space-x-2";
+          buttonWrapper.appendChild(completeBtn);
+          buttonWrapper.appendChild(deleteBtn);
+
+          li.appendChild(taskContent);
+          li.appendChild(buttonWrapper);
+          taskList.appendChild(li);
+        }
+      });
+    </script>
+  </body>
+</html>
